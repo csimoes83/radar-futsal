@@ -1,0 +1,31 @@
+name: Radar Futsal — recolha
+on:
+  schedule:
+    - cron: "*/30 6-22 * * *"   # de 30 em 30 min, ~07h-23h Lisboa (UTC+1)
+  workflow_dispatch: {}          # botão "Run" manual no GitHub
+permissions:
+  contents: write                # para dar commit do index.html
+concurrency:
+  group: radar-scan
+  cancel-in-progress: false
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Correr recolha
+        run: python scan.py
+      - name: Publicar se houve novidades
+        run: |
+          git config user.name "radar-futsal-bot"
+          git config user.email "actions@github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "Sem alterações."
+          else
+            git commit -m "Radar: recolha $(date -u +'%Y-%m-%d %H:%M')Z"
+            git push
+          fi
