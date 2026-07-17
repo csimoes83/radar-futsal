@@ -56,7 +56,7 @@ RUIDO = re.compile(
     # futsal amador/municipal/base (BR/US) — o Carlos não publica isto:
     r"campeonato municipal|municipal de futsal|interinstitucional|copa .{0,18} de futsal|"
     r"de base\b|futsal de base|categorias de base|entrada gratuita|rel[âa]mpago|"
-    r"united futsal|world futsal championships pro|liga usuluteca|santafesina|"
+    r"unitedfutsal|united futsal|world futsal champ|liga usuluteca|santafesina|"
     r"bauru cup|araucária|arapiraca|traipu|citadino|distrital amador|"
     r"ver[ãa]o|f[ée]rias|escolar\b|amistoso beneficente|torneio solid[áa]rio",
     re.I)
