@@ -165,6 +165,9 @@ def instagram_apify():
     token = os.environ.get("APIFY_TOKEN", "").strip()
     if not token:
         return []
+    # poupança: só consultar o IG 4x/dia (08/12/16/20 UTC) para caber no tier grátis
+    if datetime.now(timezone.utc).hour not in (8, 12, 16, 20):
+        return []
     url = ("https://api.apify.com/v2/acts/apify~instagram-scraper/"
            "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
     body = json.dumps({
