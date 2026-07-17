@@ -17,6 +17,8 @@ jobs:
         with:
           python-version: "3.12"
       - name: Correr recolha
+        env:
+          APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
         run: python scan.py
       - name: Publicar se houve novidades
         run: |

@@ -151,12 +151,71 @@ def texto_proprio():
 NOME_RE = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wáéíóúâêôãõç]+(?:\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wáéíóúâêôãõç]+)+")
 
 
+
+# ---- Instagram via Apify (opcional; ativa-se com APIFY_TOKEN nos GitHub Secrets) ----
+IG_HANDLES = [
+    "ligaplacard", "foconofutsal", "futsalfemininonews",
+    "scbragamodalidades", "fcfamalicaomodalidades", "electricofc_oficial",
+    "portimonense_futsal", "oficial_upvn", "scutorreensemodalidades",
+    "magnusfutsal", "womensfutsalworld", "futsalrfef",
+]
+
+def instagram_apify():
+    """Puxa os últimos posts das contas-chave via Apify. Vazio se não houver token."""
+    token = os.environ.get("APIFY_TOKEN", "").strip()
+    if not token:
+        return []
+    url = ("https://api.apify.com/v2/acts/apify~instagram-scraper/"
+           "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
+    body = json.dumps({
+        "directUrls": [f"https://www.instagram.com/{h}/" for h in IG_HANDLES],
+        "resultsType": "posts", "resultsLimit": 2, "addParentData": False,
+    }).encode()
+    req = urllib.request.Request(url, data=body,
+                                headers={**UA, "Content-Type": "application/json"})
+    out = []
+    try:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            data = json.loads(r.read())
+    except Exception as e:
+        print("IG/Apify falhou:", e)
+        return []
+    for p in data:
+        cap = (p.get("caption") or "").strip()
+        user = p.get("ownerUsername") or ""
+        ts = p.get("timestamp") or ""
+        code = p.get("shortCode") or ""
+        if not cap or not ts:
+            continue
+        try:
+            w = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+        except Exception:
+            continue
+        out.append({"title": cap[:120], "when": w, "source": "IG · @" + user,
+                    "link": f"https://www.instagram.com/p/{code}/" if code
+                            else f"https://www.instagram.com/{user}/"})
+    return out
+
+
 def main():
     agora = datetime.now(timezone.utc)
     corte = agora - timedelta(hours=JANELA_H)
     proprio = texto_proprio()
 
     itens, ok = [], 0
+    ig_itens = instagram_apify()
+    if ig_itens:
+        ok += 1
+        for it in ig_itens:
+            if not it["when"] or it["when"] < corte:
+                continue
+            if RUIDO.search(it["title"]):
+                continue
+            frases = [m.group(0).lower() for m in NOME_RE.finditer(it["title"])]
+            if proprio and any(f in proprio for f in frases if len(f) >= 9):
+                continue
+            it["key"] = key_of(it)
+            itens.append(it)
     for name, url, filt in FEEDS:
         raw = fetch(url)
         if not raw:
