@@ -168,11 +168,11 @@ def instagram_apify():
     # poupança: só consultar o IG 4x/dia (08/12/16/20 UTC) para caber no tier grátis
     if datetime.now(timezone.utc).hour not in (8, 12, 16, 20):
         return []
-    url = ("https://api.apify.com/v2/acts/apify~instagram-scraper/"
+    url = ("https://api.apify.com/v2/acts/sones~instagram-posts-scraper-lowcost/"
            "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
+    newer = (datetime.now(timezone.utc) - timedelta(hours=JANELA_H)).strftime("%Y-%m-%d")
     body = json.dumps({
-        "directUrls": [f"https://www.instagram.com/{h}/" for h in IG_HANDLES],
-        "resultsType": "posts", "resultsLimit": 2, "addParentData": False,
+        "usernames": IG_HANDLES, "postsPerProfile": 2, "newerThan": newer,
     }).encode()
     req = urllib.request.Request(url, data=body,
                                 headers={**UA, "Content-Type": "application/json"})
@@ -183,15 +183,24 @@ def instagram_apify():
     except Exception as e:
         print("IG/Apify falhou:", e)
         return []
+    def g(p, *keys):
+        for k in keys:
+            v = p.get(k)
+            if v:
+                return v
+        return ""
     for p in data:
-        cap = (p.get("caption") or "").strip()
-        user = p.get("ownerUsername") or ""
-        ts = p.get("timestamp") or ""
-        code = p.get("shortCode") or ""
+        cap = str(g(p, "caption", "text", "title")).strip()
+        user = g(p, "ownerUsername", "username", "owner_username", "ownerUserName")
+        ts = g(p, "timestamp", "takenAt", "taken_at", "takenAtTimestamp")
+        code = g(p, "shortCode", "code", "shortcode")
         if not cap or not ts:
             continue
         try:
-            w = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            if isinstance(ts, (int, float)):
+                w = datetime.fromtimestamp(ts, tz=timezone.utc)
+            else:
+                w = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
         except Exception:
             continue
         out.append({"title": cap[:120], "when": w, "source": "IG · @" + user,
