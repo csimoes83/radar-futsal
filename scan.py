@@ -50,8 +50,24 @@ FEEDS = [
     ("X · RFEF", "https://nitter.net/RFEF/rss", "FUTSAL"),
 ]
 
-RUIDO = re.compile(r"zapatill|sapatilh|decathlon|\bnike\b|\bjoma\b|ripley|balon\b|bolas?\b|tienda|loja|"
-                   r"sala de espera|sala de consumo|sala de imprensa|sala de aula", re.I)
+RUIDO = re.compile(
+    r"zapatill|sapatilh|decathlon|\bnike\b|\bjoma\b|ripley|balon\b|bolas?\b|tienda|loja|"
+    r"sala de espera|sala de consumo|sala de imprensa|sala de aula|"
+    # futsal amador/municipal/base (BR/US) — o Carlos não publica isto:
+    r"campeonato municipal|municipal de futsal|interinstitucional|copa .{0,18} de futsal|"
+    r"de base\b|futsal de base|categorias de base|entrada gratuita|rel[âa]mpago|"
+    r"united futsal|world futsal championships pro|liga usuluteca|santafesina|"
+    r"bauru cup|araucária|arapiraca|traipu|citadino|distrital amador|"
+    r"ver[ãa]o|f[ée]rias|escolar\b|amistoso beneficente|torneio solid[áa]rio",
+    re.I)
+
+# prioridade editorial do Carlos (PT + PT no estrangeiro + Placard + relevante)
+PRIO_PT = re.compile(
+    r"benfica|sporting|braga|porto|fc porto|leões porto salvo|el[ée]ctrico|torreense|fund[ãa]o|"
+    r"famalic[ãa]o|z[êe]zere|portimonense|rio ave|upvn|nun.?[áa]lvares|liga placard|liga feminina|"
+    r"sele[çc][ãa]o portuguesa|portugu[êe]s|portuguesa|treinador portugu|fpf|"
+    r"barcelona|bar[çc]a|palma|elpozo|movistar|jimbee|rfef|lnfs|uefa futsal|champions|"
+    r"ricardinho|bruno coelho|jo[ãa]o matos|higor|f[úu]tbol sala", re.I)
 
 
 def fetch(url):
@@ -163,7 +179,12 @@ def main():
     uniq = {}
     for it in sorted(itens, key=lambda x: x["when"], reverse=True):
         uniq.setdefault(it["key"], it)
-    itens = list(uniq.values())[:MAX_ITENS]
+    itens = list(uniq.values())
+    for it in itens:
+        it["prio"] = 1 if PRIO_PT.search(it["title"]) else 0
+    # PT-relevante primeiro; dentro de cada grupo, mais recente primeiro
+    itens.sort(key=lambda x: (x["prio"], x["when"]), reverse=True)
+    itens = itens[:MAX_ITENS]
 
     LX = timezone(timedelta(hours=1))  # hora de Lisboa (verão)
     stamp = agora.astimezone(LX)
@@ -173,8 +194,9 @@ def main():
     cards = []
     for it in itens:
         w = it["when"].astimezone(LX)
+        tag = ' · 🇵🇹 PARA TI' if it.get("prio") else ''
         cards.append(f'''    <div class="card">
-      <div class="k">{w:%H:%M} · {esc(it["source"])}</div>
+      <div class="k">{w:%H:%M} · {esc(it["source"])}{tag}</div>
       <h3><a href="{esc(it["link"])}" target="_blank" rel="noopener">{esc(it["title"])}</a></h3>
       <p>{esc(it["source"])} · {w:%d/%m %H:%M}</p>
     </div>''')
