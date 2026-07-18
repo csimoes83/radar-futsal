@@ -119,3 +119,6 @@ atlanticofutsal
 acbffutsal
 # + KPRF (Rússia)
 sportclubkprf
+# + media (Futsal Planet, zerozero)
+futsalplanet1997
+zerozeropt
