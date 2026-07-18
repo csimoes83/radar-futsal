@@ -4,6 +4,7 @@ Lê feeds RSS/Atom datados, filtra 48h, deduplica, escreve index.html autónomo.
 Sem dependências externas (só stdlib). Estado de dedup persiste em seen.json (commitado)."""
 import email.utils, html as html_mod, json, os, re, urllib.parse, urllib.request
 import xml.etree.ElementTree as ET
+import render as R
 from datetime import datetime, timedelta, timezone
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -48,6 +49,12 @@ FEEDS = [
     ("X · LNFS", "https://nitter.net/LNFS/rss", None),
     ("X · UEFA Futsal", "https://nitter.net/UEFAFutsal/rss", None),
     ("X · RFEF", "https://nitter.net/RFEF/rss", "FUTSAL"),
+    ("X · ElPozo", "https://nitter.net/ElPozoMurcia_FS/rss", None),
+    ("X · Pato", "https://nitter.net/patofutsal/rss", None),
+    ("X · Alzira FS", "https://nitter.net/AlziraFS/rss", None),
+    ("X · Fahey", "https://nitter.net/jamiefahey1/rss", "FUTSAL"),
+    ("X · KSA Futsal", "https://nitter.net/futsal_KSA2030/rss", None),
+    ("OFC Oceânia", "https://www.oceaniafootball.com/feed/", "FUTSAL"),
 ]
 
 RUIDO = re.compile(
@@ -228,6 +235,7 @@ def main():
                 continue
             it["key"] = key_of(it)
             itens.append(it)
+    por_fonte = {}
     for name, url, filt in FEEDS:
         raw = fetch(url)
         if not raw:
@@ -241,9 +249,10 @@ def main():
                 continue
             if req and not req.search(it["title"]):
                 continue
+            por_fonte.setdefault(name, []).append(it)  # p/ tabelas Por fonte
             frases = [m.group(0).lower() for m in NOME_RE.finditer(it["title"])]
             if proprio and any(f in proprio for f in frases if len(f) >= 9):
-                continue  # já publicado nos sites do Carlos
+                continue  # já publicado -> fora da timeline
             it["key"] = key_of(it)
             itens.append(it)
 
@@ -262,46 +271,7 @@ def main():
     meses = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"]
     data = f"{stamp.day} {meses[stamp.month-1]} {stamp.year} · {stamp:%H:%M}"
 
-    cards = []
-    for it in itens:
-        w = it["when"].astimezone(LX)
-        tag = ' · 🇵🇹 PARA TI' if it.get("prio") else ''
-        cards.append(f'''    <div class="card">
-      <div class="k">{w:%H:%M} · {esc(it["source"])}{tag}</div>
-      <h3><a href="{esc(it["link"])}" target="_blank" rel="noopener">{esc(it["title"])}</a></h3>
-      <p>{esc(it["source"])} · {w:%d/%m %H:%M}</p>
-    </div>''')
-    grid = "\n".join(cards) if cards else '<div class="card"><h3>Sem novidades nas últimas 48h</h3></div>'
-
-    html = f'''<!DOCTYPE html>
-<html lang="pt"><head><meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Radar Futsal — atualiza sozinho</title>
-<style>
- :root{{--bg:#000;--panel:#111318;--ink:#eef1f6;--muted:#9aa3b2;--line:#23262e;--acc:#f26430}}
- *{{box-sizing:border-box}} body{{margin:0;background:var(--bg);color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.5}}
- .wrap{{max-width:1080px;margin:0 auto;padding:20px 20px 64px}}
- header{{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px}}
- h1{{font-size:22px;margin:0}} .sub{{color:var(--muted);font-size:13px}}
- .stamp{{margin-left:auto;color:var(--muted);font-size:12px}} .stamp b{{color:var(--ink)}}
- .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:20px}}
- .card{{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}}
- .k{{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--acc)}}
- .card h3{{font-size:15px;margin:6px 0}} .card h3 a{{color:var(--ink);text-decoration:none}}
- .card h3 a:hover{{text-decoration:underline}} .card p{{margin:0;font-size:12px;color:var(--muted)}}
- footer{{margin-top:34px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px}}
-</style></head><body><div class="wrap">
-<header>
- <h1>🏐 Radar Futsal</h1>
- <span class="sub">atualiza-se sozinho de 30 em 30 min · sem PC ligado</span>
- <span class="stamp">Recolha de <b>{data}</b> (Lisboa) · {len(itens)} notícias · {ok}/{len(FEEDS)} fontes</span>
-</header>
-<div class="grid">
-{grid}
-</div>
-<footer>Radar Futsal · gerado automaticamente no GitHub Actions a partir de feeds oficiais de futsal. As notícias já publicadas em zonatecnicafutsal.com / futsalportugal.com são omitidas.</footer>
-</div></body></html>'''
+    html = R.render(itens, por_fonte, data, ok, len(FEEDS))
 
     with open(os.path.join(ROOT, "index.html"), "w", encoding="utf-8") as f:
         f.write(html)
