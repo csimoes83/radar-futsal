@@ -122,3 +122,5 @@ sportclubkprf
 # + media (Futsal Planet, zerozero)
 futsalplanet1997
 zerozeropt
+# + Napoli Futsal (IT)
+napolic5
