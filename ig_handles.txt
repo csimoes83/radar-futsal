@@ -124,3 +124,5 @@ futsalplanet1997
 zerozeropt
 # + Napoli Futsal (IT)
 napolic5
+# + Kairat (KZ)
+afckairat
