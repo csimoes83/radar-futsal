@@ -14,6 +14,8 @@
  .search{flex:1 1 220px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14px;outline:none}
  .chip{padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12.5px;cursor:pointer}
  .chip.active{background:var(--acc);border-color:var(--acc);color:#fff}
+ .chip.refresh{color:var(--acc);border-color:var(--acc);font-weight:700}
+ .chip.refresh:active{transform:scale(.96)}
  .sec{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 12px;font-weight:600}
  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
@@ -33,10 +35,11 @@
 <header>
  <h1>🏐 Radar Futsal</h1>
  <span class="sub">atualiza-se sozinho · sem PC ligado</span>
- <span class="stamp">Recolha de <b>18 jul 2026 · 13:21</b> (Lisboa) · 40 novidades · 34/34 fontes</span>
+ <span class="stamp">Recolha de <b>18 jul 2026 · 14:14</b> (Lisboa) · 40 novidades · 35/34 fontes</span>
 </header>
 <div class="controls">
  <input id="q" class="search" type="search" placeholder="🔍 Procurar clube, jogador, país…">
+ <button id="refresh" class="chip refresh" title="Recarregar a recolha mais recente">↻ Atualizar</button>
  <button class="chip active" data-f="all">Tudo</button>
  <button class="chip" data-f="pt">🇵🇹 PT</button>
  <button class="chip" data-f="es">🇪🇸 ES</button>
@@ -118,6 +121,11 @@ Parabéns, @higor.ribeiro! 🥳</a></h3>
       <p>Google Alerts · 18/07 05:34</p>
     </div>
     <div class="card" data-f="pt">
+      <div class="k">05:10 · Alerts Futsal · 🇵🇹 PARA TI</div>
+      <h3><a href="https://www.facebook.com/MFFFutsal/posts/fire-dragon-futsal-championship-2026-group-stage-pacific-sun-far-fc-2-2-kky-fc-f/1566242071965970/" target="_blank" rel="noopener">Fire Dragon Futsal Championship 2026 (Group Stage) ---------------- Pacific Sun Far FC (2-2 ...</a></h3>
+      <p>Alerts Futsal · 18/07 05:10</p>
+    </div>
+    <div class="card" data-f="pt">
       <div class="k">03:53 · Google Alerts · 🇵🇹 PARA TI</div>
       <h3><a href="https://www.instagram.com/p/Da6kFSODWKj/" target="_blank" rel="noopener">¡La emoción del fútbol sala continúa! Mañana conoceremos a los nuevos campeones en ...</a></h3>
       <p>Google Alerts · 18/07 03:53</p>
@@ -178,16 +186,40 @@ Parabéns, @higor.ribeiro! 🥳</a></h3>
       <p>X · ElPozo · 16/07 16:07</p>
     </div>
     <div class="card" data-f="mundo">
+      <div class="k">14:07 · IG · @futsalrfef</div>
+      <h3><a href="https://www.instagram.com/p/Da72BSSKUTA/" target="_blank" rel="noopener">🔒 ¡Elegimos a la Mejor Cierre de la temporada! 
+
+✍️ ¡Déjanos en comentarios tu favorito! 
+
+🌟 @arianefutsal 👕 @futsi_atle</a></h3>
+      <p>IG · @futsalrfef · 18/07 14:07</p>
+    </div>
+    <div class="card" data-f="mundo">
+      <div class="k">14:06 · IG · @osbelenenses</div>
+      <h3><a href="https://www.instagram.com/p/Da727vHFcBO/" target="_blank" rel="noopener">🔵 Jogo de Preparação 
+
+O #Belenenses realizou esta manhã mais um jogo de preparação, frente ao Caldas SC, no Campo 3 do </a></h3>
+      <p>IG · @osbelenenses · 18/07 14:06</p>
+    </div>
+    <div class="card" data-f="mundo">
+      <div class="k">13:25 · IG · @sportingmodalidades</div>
+      <h3><a href="https://www.instagram.com/p/Da7yPf5goxz/" target="_blank" rel="noopener">🗣️ “É uma honra enorme e, sem dúvida, um grande passo em frente na minha carreira. Vou dar o meu melhor para ajudar o Cl</a></h3>
+      <p>IG · @sportingmodalidades · 18/07 13:25</p>
+    </div>
+    <div class="card" data-f="mundo">
+      <div class="k">13:21 · IG · @patofutsaloficial</div>
+      <h3><a href="https://www.instagram.com/p/Da7x0n8pyKb/" target="_blank" rel="noopener">🔥 HOJE TEM PATO🔥
+🏆 Liga Nacional de Futsal 
+⚽️ Umuarama x Pato Futsal 
+🗓️ Sábado / 18 de julho 
+⏰ 20:30 
+🏟️ Ginásio Amár</a></h3>
+      <p>IG · @patofutsaloficial · 18/07 13:21</p>
+    </div>
+    <div class="card" data-f="mundo">
       <div class="k">13:09 · Palma Futsal</div>
       <h3><a href="https://www.palmafutsal.com/carlos-gomez-he-madurado-bastante-como-jugador/" target="_blank" rel="noopener">Carlos Gómez: “He madurado bastante como jugador”</a></h3>
       <p>Palma Futsal · 18/07 13:09</p>
-    </div>
-    <div class="card" data-f="mundo">
-      <div class="k">13:00 · IG · @sportingmodalidades</div>
-      <h3><a href="https://www.instagram.com/p/Da7vYdoDJsv/" target="_blank" rel="noopener">O guardião, @sasha_sukhov_77, é o mais recente reforço do #FutsalSCP ⚡️
-
-Bem-vindo ao reino do Leão 🦁</a></h3>
-      <p>IG · @sportingmodalidades · 18/07 13:00</p>
     </div>
     <div class="card" data-f="mundo">
       <div class="k">12:56 · Meta Catania</div>
@@ -251,30 +283,9 @@ Ontem, o Minas Tênis Clube Futsal venceu o Marreco ABF Futsal, por 1 a 0, gol d
       <p>IG · @shinagawacity_futsalclub · 18/07 10:56</p>
     </div>
     <div class="card" data-f="mundo">
-      <div class="k">10:41 · IG · @futsalrfef</div>
-      <h3><a href="https://www.instagram.com/p/Da7fZI3Knym/" target="_blank" rel="noopener">✨ Wonderkid @m_.toure</a></h3>
-      <p>IG · @futsalrfef · 18/07 10:41</p>
-    </div>
-    <div class="card" data-f="mundo">
       <div class="k">10:35 · X · Palma</div>
       <h3><a href="https://nitter.net/PalmaFutsal/status/2078413215256514851#m" target="_blank" rel="noopener">👋🏻 Hay caras que no se olvidan.</a></h3>
       <p>X · Palma · 18/07 10:35</p>
-    </div>
-    <div class="card" data-f="mundo">
-      <div class="k">10:01 · Alerts Futsal</div>
-      <h3><a href="https://www.heraldonline.co.zw/futsal-returns-as-banda-calls-for-discipline-growth/" target="_blank" rel="noopener">Futsal returns as Banda calls for discipline, growth - The Herald</a></h3>
-      <p>Alerts Futsal · 18/07 10:01</p>
-    </div>
-    <div class="card" data-f="mundo">
-      <div class="k">10:00 · IG · @piastgliwicefutsal</div>
-      <h3><a href="https://www.instagram.com/p/Da7a2ReCECW/" target="_blank" rel="noopener">Słoneczne pozdrowienia prosto z wakacji! 🌴
-Sebastian Szadurski wykorzystuje ostatnie wolne chwile na pełen relaks w rodz</a></h3>
-      <p>IG · @piastgliwicefutsal · 18/07 10:00</p>
-    </div>
-    <div class="card" data-f="mundo">
-      <div class="k">09:30 · X · Palma</div>
-      <h3><a href="https://nitter.net/PalmaFutsal/status/2078396859144605923#m" target="_blank" rel="noopener">🌞 Parece que este verano va de reencuentros.</a></h3>
-      <p>X · Palma · 18/07 09:30</p>
     </div>
 </div>
 <div class="sec">Por fonte</div>
@@ -286,7 +297,6 @@ Sebastian Szadurski wykorzystuje ostatnie wolne chwile na pełen relaks w rodz</
       <li><a href="https://www.palmafutsal.com/carlos-gomez-he-madurado-bastante-como-jugador/" target="_blank" rel="noopener">Carlos Gómez: “He madurado bastante como jugador”</a> <span class="t">· 18/07</span></li>
       <li><a href="https://www.palmafutsal.com/carlos-gomez-regresa-a-palma-para-incorporarse-al-proyecto/" target="_blank" rel="noopener">Carlos Gómez regresa a Palma para incorporarse al proyecto</a> <span class="t">· 18/07</span></li>
       <li><a href="https://www.palmafutsal.com/el-illes-balears-palma-futsal-alcanza-los-2-970-abonados/" target="_blank" rel="noopener">2.970 abonados antes del inicio de las nuevas altas</a> <span class="t">· 17/07</span></li>
-      <li><a href="https://www.interfutbolsala.com/2026/07/17/inter-jp-financial-defiende-su-condicion-de-club-mas-laureado-de-la-historia-de-la-primera-division-en-busca-del-primer-titulo-de-la-nueva-liga-prime-futsal/" target="_blank" rel="noopener">Inter JP Financial defiende su condición de club más laureado de la historia de la Primera Divi</a> <span class="t">· 17/07</span></li>
       <li><a href="https://www.elpozomurcia.com/campana-abonos-26-27-mas-una-nueva-temporada-para-seguir-haciendo-historia-juntos/" target="_blank" rel="noopener">Campaña Abonos 26-27| #MÁS: una nueva temporada para seguir haciendo historia juntos</a> <span class="t">· 17/07</span></li>
     </ul>
   </div>
@@ -342,9 +352,18 @@ Sebastian Szadurski wykorzystuje ostatnie wolne chwile na pełen relaks w rodz</
   });
  }
  q.addEventListener('input',apply);
- document.querySelectorAll('.chip').forEach(function(ch){ch.addEventListener('click',function(){
-  document.querySelectorAll('.chip').forEach(function(x){x.classList.remove('active')});
-  ch.classList.add('active');apply();});});
+ var refresh=document.getElementById('refresh');
+ refresh.addEventListener('click',function(){
+  refresh.textContent='↻ A atualizar…';
+  location.reload(true);
+ });
+ document.querySelectorAll('.chip').forEach(function(ch){
+  if(ch.id==='refresh')return;
+  ch.addEventListener('click',function(){
+   document.querySelectorAll('.chip').forEach(function(x){if(x.id!=='refresh')x.classList.remove('active')});
+   ch.classList.add('active');apply();});});
+ // auto-atualiza a cada 5 min enquanto o painel estiver aberto
+ setInterval(function(){location.reload(true);}, 5*60*1000);
 })();
 </script>
 </body></html>
