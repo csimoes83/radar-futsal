@@ -128,3 +128,5 @@ napolic5
 afckairat
 # + Record (imprensa PT)
 record_portugal
+# + feminino
+5womens.sports
