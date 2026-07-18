@@ -26,8 +26,14 @@ jobs:
           git config user.email "actions@github.com"
           git add index.html
           if git diff --cached --quiet; then
-            echo "Sem alterações."
-          else
-            git commit -m "Radar: recolha $(date -u +'%Y-%m-%d %H:%M')Z"
-            git push
+            echo "Sem alterações."; exit 0
           fi
+          git commit -m "Radar: recolha $(date -u +'%Y-%m-%d %H:%M')Z"
+          # retry: em corrida com outros gatilhos, rebase por cima e volta a tentar
+          for i in 1 2 3 4 5; do
+            if git push; then echo "push OK"; exit 0; fi
+            echo "push rejeitado (corrida) — tentativa $i, a rebasar…"
+            git pull --rebase -X ours origin main || true
+            sleep 4
+          done
+          echo "push falhou após 5 tentativas"; exit 1
