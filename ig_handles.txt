@@ -126,3 +126,5 @@ zerozeropt
 napolic5
 # + Kairat (KZ)
 afckairat
+# + Record (imprensa PT)
+record_portugal
