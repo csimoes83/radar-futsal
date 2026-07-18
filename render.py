@@ -82,6 +82,8 @@ def render(itens, por_fonte, data, ok, nfeeds):
  .search{{flex:1 1 220px;padding:9px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14px;outline:none}}
  .chip{{padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12.5px;cursor:pointer}}
  .chip.active{{background:var(--acc);border-color:var(--acc);color:#fff}}
+ .chip.refresh{{color:var(--acc);border-color:var(--acc);font-weight:700}}
+ .chip.refresh:active{{transform:scale(.96)}}
  .sec{{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:26px 0 12px;font-weight:600}}
  .grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}}
  .card{{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}}
@@ -105,6 +107,7 @@ def render(itens, por_fonte, data, ok, nfeeds):
 </header>
 <div class="controls">
  <input id="q" class="search" type="search" placeholder="🔍 Procurar clube, jogador, país…">
+ <button id="refresh" class="chip refresh" title="Recarregar a recolha mais recente">↻ Atualizar</button>
  <button class="chip active" data-f="all">Tudo</button>
  <button class="chip" data-f="pt">🇵🇹 PT</button>
  <button class="chip" data-f="es">🇪🇸 ES</button>
@@ -141,9 +144,18 @@ def render(itens, por_fonte, data, ok, nfeeds):
   }});
  }}
  q.addEventListener('input',apply);
- document.querySelectorAll('.chip').forEach(function(ch){{ch.addEventListener('click',function(){{
-  document.querySelectorAll('.chip').forEach(function(x){{x.classList.remove('active')}});
-  ch.classList.add('active');apply();}});}});
+ var refresh=document.getElementById('refresh');
+ refresh.addEventListener('click',function(){{
+  refresh.textContent='↻ A atualizar…';
+  location.reload(true);
+ }});
+ document.querySelectorAll('.chip').forEach(function(ch){{
+  if(ch.id==='refresh')return;
+  ch.addEventListener('click',function(){{
+   document.querySelectorAll('.chip').forEach(function(x){{if(x.id!=='refresh')x.classList.remove('active')}});
+   ch.classList.add('active');apply();}});}});
+ // auto-atualiza a cada 5 min enquanto o painel estiver aberto
+ setInterval(function(){{location.reload(true);}}, 5*60*1000);
 }})();
 </script>
 </body></html>'''
