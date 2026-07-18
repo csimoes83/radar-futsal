@@ -102,3 +102,18 @@ fsciudaddelvino
 divisionecalcio5
 sefutbolfem
 uefafutsal
+# + gigantes (Palma, Carlos Barbosa/ACBF, Jaén, Osasuna) + Brasil (Atlântico, Jaraguá, Marreco, Krona)
+jaenfutbolsala
+palmafutsaloficial
+riberanavarrafs
+c.d.xota
+futsalslovakia.sk
+pasionfutsal
+osbelenenses
+fozcataratas_futsal
+patofutsaloficial
+jaraguafutsal
+marrecofutsaloficial
+jec.krona
+atlanticofutsal
+acbffutsal
