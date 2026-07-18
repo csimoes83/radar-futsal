@@ -182,8 +182,10 @@ def instagram_apify():
     token = os.environ.get("APIFY_TOKEN", "").strip()
     if not token:
         return []
-    # poupança: só consultar o IG 4x/dia (08/12/16/20 UTC) para caber no tier grátis
-    if datetime.now(timezone.utc).hour not in (8, 12, 16, 20):
+    # poupança: só consultar o IG 4x/dia (08/12/16/20 UTC) para caber no tier grátis;
+    # mas em disparo manual (workflow_dispatch) corre sempre, p/ forçar/testar sweeps
+    manual = os.environ.get("GITHUB_EVENT_NAME", "") == "workflow_dispatch"
+    if not manual and datetime.now(timezone.utc).hour not in (8, 12, 16, 20):
         return []
     url = ("https://api.apify.com/v2/acts/sones~instagram-posts-scraper-lowcost/"
            "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
