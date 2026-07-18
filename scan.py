@@ -160,12 +160,22 @@ NOME_RE = re.compile(r"[A-ZÁÉÍÓÚÂÊÔÃÕÇ][\wáéíóúâêôãõç]+(?:
 
 
 # ---- Instagram via Apify (opcional; ativa-se com APIFY_TOKEN nos GitHub Secrets) ----
-IG_HANDLES = [
-    "ligaplacard", "foconofutsal", "futsalfemininonews",
-    "scbragamodalidades", "fcfamalicaomodalidades", "electricofc_oficial",
-    "portimonense_futsal", "oficial_upvn", "scutorreensemodalidades",
-    "magnusfutsal", "womensfutsalworld", "futsalrfef",
-]
+def _load_ig_handles():
+    p = os.path.join(ROOT, "ig_handles.txt")
+    try:
+        linhas = open(p, encoding="utf-8").read().splitlines()
+    except Exception:
+        return ["ligaplacard", "foconofutsal", "magnusfutsal", "futsalrfef"]
+    hs, vistos = [], set()
+    for ln in linhas:
+        ln = ln.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        if ln not in vistos:
+            vistos.add(ln); hs.append(ln)
+    return hs
+
+IG_HANDLES = _load_ig_handles()
 
 def instagram_apify():
     """Puxa os últimos posts das contas-chave via Apify. Vazio se não houver token."""
