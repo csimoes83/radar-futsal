@@ -77,3 +77,15 @@ fcaguiassantamarta
 # + Rio Ave (Placard M completa!) + media IT
 calcioa5live
 maisrioave
+# + lote: fecha Liga Feminina (Atlético CP, Povoense, Santa Luzia, Maia) + clubes + arbitragem
+cdrc_smm_futsal
+deolhonarbitragem
+afdecampo
+casangemil
+parcpindelo
+camogadouro
+arcdmendiga
+atleticocp
+u.a.povoense
+santa_luzia_futebolclube
+maiafutsal
