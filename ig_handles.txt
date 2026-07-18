@@ -89,3 +89,16 @@ atleticocp
 u.a.povoense
 santa_luzia_futebolclube
 maiafutsal
+# + internacional (Jimbee, UEFA Futsal, LNF, ligas PL/IT/JP)
+leoasdaserra
+lnfoficial
+jimbeecartagena
+futsalekstraklasa
+shinagawacity_futsalclub
+futcvermoim
+aramarense
+jomasport_futsal
+fsciudaddelvino
+divisionecalcio5
+sefutbolfem
+uefafutsal
