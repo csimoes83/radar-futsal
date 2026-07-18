@@ -202,21 +202,27 @@ def instagram_apify():
     except Exception as e:
         print("IG/Apify falhou:", e)
         return []
-    print("IG/Apify DEBUG itens brutos:", len(data))
-    if data:
-        print("IG/Apify DEBUG chaves:", list(data[0].keys())[:20])
-        print("IG/Apify DEBUG amostra:", json.dumps(data[0])[:400])
+
     def g(p, *keys):
         for k in keys:
             v = p.get(k)
             if v:
                 return v
         return ""
+    n_ok = 0
     for p in data:
-        cap = str(g(p, "caption", "text", "title")).strip()
-        user = g(p, "ownerUsername", "username", "owner_username", "ownerUserName")
-        ts = g(p, "timestamp", "takenAt", "taken_at", "takenAtTimestamp")
-        code = g(p, "shortCode", "code", "shortcode")
+        # caption pode vir como objeto {"text": ...} ou string
+        cap = p.get("caption")
+        if isinstance(cap, dict):
+            cap = cap.get("text", "")
+        cap = str(cap or g(p, "text", "title")).strip()
+        # username: scraped_username / user.username / ownerUsername ...
+        user = g(p, "scraped_username", "ownerUsername", "username", "owner_username", "ownerUserName")
+        if not user and isinstance(p.get("user"), dict):
+            user = p["user"].get("username", "")
+        ts = g(p, "taken_at", "timestamp", "takenAt", "takenAtTimestamp")
+        code = g(p, "code", "shortCode", "shortcode")
+        post_url = g(p, "post_url", "url")
         if not cap or not ts:
             continue
         try:
@@ -226,9 +232,14 @@ def instagram_apify():
                 w = datetime.fromisoformat(str(ts).replace("Z", "+00:00"))
         except Exception:
             continue
-        out.append({"title": cap[:120], "when": w, "source": "IG · @" + user,
-                    "link": f"https://www.instagram.com/p/{code}/" if code
-                            else f"https://www.instagram.com/{user}/"})
+        link = (post_url if post_url else
+                (f"https://www.instagram.com/p/{code}/" if code
+                 else f"https://www.instagram.com/{user}/"))
+        out.append({"title": cap[:120], "when": w,
+                    "source": ("IG · @" + user) if user else "IG",
+                    "link": link})
+        n_ok += 1
+    print(f"IG/Apify: {len(data)} brutos -> {n_ok} posts com data")
     return out
 
 
