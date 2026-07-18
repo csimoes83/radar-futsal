@@ -202,6 +202,10 @@ def instagram_apify():
     except Exception as e:
         print("IG/Apify falhou:", e)
         return []
+    print("IG/Apify DEBUG itens brutos:", len(data))
+    if data:
+        print("IG/Apify DEBUG chaves:", list(data[0].keys())[:20])
+        print("IG/Apify DEBUG amostra:", json.dumps(data[0])[:400])
     def g(p, *keys):
         for k in keys:
             v = p.get(k)
