@@ -287,6 +287,23 @@ def main():
     for it in sorted(itens, key=lambda x: x["when"], reverse=True):
         uniq.setdefault(it["key"], it)
     itens = list(uniq.values())
+
+    # equilíbrio: no máximo 1 post por conta de IG e um teto global de IG,
+    # para o Instagram não afogar as notícias curadas dos feeds/jornais
+    IG_MAX_POR_CONTA = 1
+    IG_MAX_TOTAL = 14
+    vistos_ig, ig_total, equilibrado = {}, 0, []
+    for it in sorted(itens, key=lambda x: x["when"], reverse=True):
+        if it["source"].startswith("IG"):
+            if ig_total >= IG_MAX_TOTAL:
+                continue
+            if vistos_ig.get(it["source"], 0) >= IG_MAX_POR_CONTA:
+                continue
+            vistos_ig[it["source"]] = vistos_ig.get(it["source"], 0) + 1
+            ig_total += 1
+        equilibrado.append(it)
+    itens = equilibrado
+
     for it in itens:
         it["prio"] = 1 if PRIO_PT.search(it["title"]) else 0
     # PT-relevante primeiro; dentro de cada grupo, mais recente primeiro
