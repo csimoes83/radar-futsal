@@ -2,7 +2,12 @@ name: Radar Futsal — recolha
 on:
   schedule:
     - cron: "*/30 6-22 * * *"   # de 30 em 30 min, ~07h-23h Lisboa (UTC+1)
-  workflow_dispatch: {}          # botão "Run" manual no GitHub
+  workflow_dispatch:
+    inputs:
+      force_ig:
+        description: "Forçar varredura de Instagram agora (custa crédito Apify)"
+        type: boolean
+        default: false
 permissions:
   contents: write                # para dar commit do index.html
 concurrency:
@@ -19,12 +24,13 @@ jobs:
       - name: Correr recolha
         env:
           APIFY_TOKEN: ${{ secrets.APIFY_TOKEN }}
+          FORCE_IG: ${{ github.event.inputs.force_ig }}
         run: python scan.py
       - name: Publicar se houve novidades
         run: |
           git config user.name "radar-futsal-bot"
           git config user.email "actions@github.com"
-          git add index.html
+          git add index.html ig_last.txt 2>/dev/null || git add index.html
           if git diff --cached --quiet; then
             echo "Sem alterações."; exit 0
           fi

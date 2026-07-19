@@ -182,16 +182,28 @@ def instagram_apify():
     token = os.environ.get("APIFY_TOKEN", "").strip()
     if not token:
         return []
-    # poupança: só consultar o IG 4x/dia (08/12/16/20 UTC) para caber no tier grátis;
-    # mas em disparo manual (workflow_dispatch) corre sempre, p/ forçar/testar sweeps
-    manual = os.environ.get("GITHUB_EVENT_NAME", "") == "workflow_dispatch"
-    if not manual and datetime.now(timezone.utc).hour not in (8, 12, 16, 20):
-        return []
+    # poupança: cada varredura custa Apify -> só consultar o IG 4x/dia
+    # (08/12/16/20 UTC). Forçar só com o input explícito force_ig=true
+    # (NÃO nos empurrões automáticos do Mac de 30/30min, senão o custo dispara).
+    forcar = os.environ.get("FORCE_IG", "").lower() == "true"
+    agora_ig = datetime.now(timezone.utc)
+    bucket = agora_ig.strftime("%Y-%m-%d-%H")  # janela horária
+    marca = os.path.join(ROOT, "ig_last.txt")
+    if not forcar:
+        if agora_ig.hour not in (8, 12, 16, 20):
+            return []
+        # guarda: no máx 1 varredura paga por janela horária (o Mac empurra 2x/hora)
+        try:
+            if open(marca, encoding="utf-8").read().strip() == bucket:
+                return []
+        except Exception:
+            pass
     url = ("https://api.apify.com/v2/acts/sones~instagram-posts-scraper-lowcost/"
            "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
     newer = (datetime.now(timezone.utc) - timedelta(hours=JANELA_H)).strftime("%Y-%m-%d")
     body = json.dumps({
         "usernames": IG_HANDLES, "postsPerProfile": 2, "newerThan": newer,
+        "resultsLimit": 250, "maxItems": 250,  # teto de custo (~2/conta)
     }).encode()
     req = urllib.request.Request(url, data=body,
                                 headers={**UA, "Content-Type": "application/json"})
@@ -239,6 +251,10 @@ def instagram_apify():
                     "source": ("IG · @" + user) if user else "IG",
                     "link": link})
         n_ok += 1
+    try:  # carimba a janela como já varrida (evita 2ª varredura paga na mesma hora)
+        open(marca, "w", encoding="utf-8").write(bucket)
+    except Exception:
+        pass
     print(f"IG/Apify: {len(data)} brutos -> {n_ok} posts com data")
     return out
 
