@@ -201,9 +201,11 @@ def instagram_apify():
     url = ("https://api.apify.com/v2/acts/sones~instagram-posts-scraper-lowcost/"
            "run-sync-get-dataset-items?token=" + urllib.parse.quote(token))
     newer = (datetime.now(timezone.utc) - timedelta(hours=JANELA_H)).strftime("%Y-%m-%d")
+    # só puxamos 1 post/conta (é o que o painel mostra) -> custo ~1/6,
+    # o que permite 4x/dia dentro do crédito grátis do Apify
     body = json.dumps({
-        "usernames": IG_HANDLES, "postsPerProfile": 2, "newerThan": newer,
-        "resultsLimit": 250, "maxItems": 250,  # teto de custo (~2/conta)
+        "usernames": IG_HANDLES, "postsPerProfile": 1, "newerThan": newer,
+        "resultsLimit": 200, "maxItems": 200,
     }).encode()
     req = urllib.request.Request(url, data=body,
                                 headers={**UA, "Content-Type": "application/json"})
