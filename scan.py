@@ -177,11 +177,36 @@ def _load_ig_handles():
 
 IG_HANDLES = _load_ig_handles()
 
+IG_CACHE = os.path.join(ROOT, "ig_cache.json")
+
+def _ig_load_cache():
+    """Posts de IG da última varredura (persistem entre recolhas sem custo)."""
+    try:
+        raw = json.load(open(IG_CACHE, encoding="utf-8"))
+    except Exception:
+        return []
+    out = []
+    for it in raw:
+        try:
+            it["when"] = datetime.fromisoformat(it["when"])
+            out.append(it)
+        except Exception:
+            pass
+    return out
+
+def _ig_save_cache(items):
+    try:
+        json.dump([{**it, "when": it["when"].isoformat()} for it in items],
+                  open(IG_CACHE, "w", encoding="utf-8"), ensure_ascii=False)
+    except Exception:
+        pass
+
 def instagram_apify():
-    """Puxa os últimos posts das contas-chave via Apify. Vazio se não houver token."""
+    """Puxa os últimos posts das contas via Apify nas janelas do dia; fora disso
+    devolve a cache (para o IG persistir no painel entre varreduras pagas)."""
     token = os.environ.get("APIFY_TOKEN", "").strip()
     if not token:
-        return []
+        return _ig_load_cache()
     # poupança: cada varredura custa Apify -> só consultar o IG 4x/dia
     # (08/12/16/20 UTC). Forçar só com o input explícito force_ig=true
     # (NÃO nos empurrões automáticos do Mac de 30/30min, senão o custo dispara).
@@ -191,11 +216,11 @@ def instagram_apify():
     marca = os.path.join(ROOT, "ig_last.txt")
     if not forcar:
         if agora_ig.hour not in (8, 12, 16, 20):
-            return []
+            return _ig_load_cache()   # fora de janela: mantém os posts já guardados
         # guarda: no máx 1 varredura paga por janela horária (o Mac empurra 2x/hora)
         try:
             if open(marca, encoding="utf-8").read().strip() == bucket:
-                return []
+                return _ig_load_cache()
         except Exception:
             pass
     url = ("https://api.apify.com/v2/acts/sones~instagram-posts-scraper-lowcost/"
@@ -215,7 +240,7 @@ def instagram_apify():
             data = json.loads(r.read())
     except Exception as e:
         print("IG/Apify falhou:", e)
-        return []
+        return _ig_load_cache()   # falha na varredura: não apagar o que já havia
 
     def g(p, *keys):
         for k in keys:
@@ -257,7 +282,11 @@ def instagram_apify():
         open(marca, "w", encoding="utf-8").write(bucket)
     except Exception:
         pass
-    print(f"IG/Apify: {len(data)} brutos -> {n_ok} posts com data")
+    if out:
+        _ig_save_cache(out)   # guarda p/ persistir entre varreduras
+    else:
+        out = _ig_load_cache()  # varredura vazia: mantém o anterior
+    print(f"IG/Apify: {len(data)} brutos -> {n_ok} posts com data (cache atualizada)")
     return out
 
 

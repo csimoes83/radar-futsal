@@ -30,7 +30,7 @@ jobs:
         run: |
           git config user.name "radar-futsal-bot"
           git config user.email "actions@github.com"
-          git add index.html ig_last.txt 2>/dev/null || git add index.html
+          git add index.html ig_last.txt ig_cache.json 2>/dev/null || git add index.html
           if git diff --cached --quiet; then
             echo "Sem alterações."; exit 0
           fi
