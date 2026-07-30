@@ -99,7 +99,24 @@ def render(itens, por_fonte, data, ok, nfeeds):
  .src li:last-child{{border-bottom:0}} .src li a{{color:var(--acc);text-decoration:none}} .src li .t{{font-size:11px;color:var(--muted)}}
  .hidden{{display:none!important}}
  footer{{margin-top:34px;color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:16px}}
-</style></head><body><div class="wrap">
+ #gate{{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}}
+ #gate.hidden{{display:none}}
+ #gate .box{{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:30px 26px;max-width:330px;width:90%;text-align:center}}
+ #gate .box h2{{margin:10px 0 4px;font-size:18px}} #gate .box p{{color:var(--muted);font-size:13px;margin:0}}
+ #gate input{{width:100%;padding:11px 14px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:15px;margin:14px 0 6px;outline:none}}
+ #gate button{{width:100%;padding:11px;border-radius:10px;border:0;background:var(--acc);color:#fff;font-weight:700;font-size:15px;cursor:pointer}}
+ #gate .err{{color:#ff6b6b;font-size:13px;min-height:17px;margin-top:6px}}
+ body.locked{{overflow:hidden}}
+</style></head><body>
+<div id="gate"><div class="box">
+ <div style="font-size:34px">🏐🔒</div>
+ <h2>Radar Futsal</h2>
+ <p>Painel privado da equipa.<br>Introduz a palavra-passe.</p>
+ <input id="gpw" type="password" placeholder="Palavra-passe" autocomplete="current-password">
+ <div class="err" id="gerr"></div>
+ <button id="gbtn">Entrar</button>
+</div></div>
+<div class="wrap">
 <header>
  <h1>🏐 Radar Futsal</h1>
  <span class="sub">atualiza-se sozinho · sem PC ligado</span>
@@ -156,6 +173,27 @@ def render(itens, por_fonte, data, ok, nfeeds):
    ch.classList.add('active');apply();}});}});
  // auto-atualiza a cada 5 min enquanto o painel estiver aberto
  setInterval(function(){{location.reload(true);}}, 5*60*1000);
+}})();
+</script>
+<script>
+(function(){{
+ var HASH="db1603742b96054705364f15a915d14d04753aeb439a63b71a91315a5d8aee3a";
+ var g=document.getElementById('gate'),pw=document.getElementById('gpw'),
+     er=document.getElementById('gerr'),b=document.getElementById('gbtn');
+ function unlock(){{g.classList.add('hidden');document.body.classList.remove('locked');}}
+ if(localStorage.getItem('radar_ok')==='1'){{unlock();}}
+ else{{document.body.classList.add('locked');setTimeout(function(){{pw.focus();}},50);}}
+ async function sha(s){{
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(function(x){{return x.toString(16).padStart(2,'0');}}).join('');
+ }}
+ async function tryit(){{
+  var h=await sha(pw.value);
+  if(h===HASH){{localStorage.setItem('radar_ok','1');unlock();}}
+  else{{er.textContent='Palavra-passe errada';pw.value='';pw.focus();}}
+ }}
+ if(b){{b.addEventListener('click',tryit);
+  pw.addEventListener('keydown',function(e){{if(e.key==='Enter')tryit();}});}}
 }})();
 </script>
 </body></html>'''
