@@ -1,7 +1,10 @@
 name: Radar Futsal — recolha
 on:
   schedule:
-    - cron: "*/30 6-22 * * *"   # de 30 em 30 min, ~07h-23h Lisboa (UTC+1)
+    # rede de segurança (quando o Mac está desligado) — 4x/dia, alinhado às
+    # janelas de IG. O Mac empurra de 30/30min quando ligado (gatilho principal).
+    # Evita colisões com o Mac (antes era */30 -> cancelamentos + emails).
+    - cron: "0 8,12,16,20 * * *"
   workflow_dispatch:
     inputs:
       force_ig:
